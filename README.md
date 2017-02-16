@@ -1,7 +1,7 @@
 
 <h1>Scala stream example</h1>
 
-author: Bruno Fitas < brunofitas@gmail.com >
+author: Bruno Fitas
 
 
 <br/>
