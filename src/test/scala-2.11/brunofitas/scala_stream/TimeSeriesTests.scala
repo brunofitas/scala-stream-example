@@ -31,7 +31,7 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
   }
 
 
-  "fromChar" should "return a Stream[Line] with a valid stream" in {
+  "fromChar" should "return a Stream[Option[Line]] with valid data" in {
     val ts = new TimeSeries
     val filePath = getClass.getResource(validStream).getPath
 
