@@ -5,8 +5,9 @@ author: Bruno Fitas < brunofitas@gmail.com >
 
 
 <br/>
-Example application that processes time series from a file
-<br/>
+Example application that processes time series from a file using a stream from scala standard library.
+
+The application takes an argument with the path to a file containing time series and prints out the analysis results taken from a rolling window of 60 seconds.
 
 
 **Input:**
@@ -27,11 +28,10 @@ Example application that processes time series from a file
 ```
 
 
-window_time => 60 seconds
 
 **Output:**
 
-`[time_in_seconds] [ratio] [window_events] [window_ratio_sum] [window_min_ratio] [window_max_ratio]`
+`[time_in_seconds] [ratio] [w_events] [w_ratio_sum] [w_min_ratio] [w_max_ratio]`
 
 ```
 T          V       N RS      MinV    MaxV
@@ -48,25 +48,35 @@ T          V       N RS      MinV    MaxV
 1355271023 1,80285 2 3,60530 1,80245 1,80285
 ```
 
+<br/>
+
+The method `run` starts the stream:
+
+
+```
+def run(filename: String): Unit = {
+  println(
+    s"""T          V       N RS      MinV    MaxV
+        |--------------------------------------------- """.stripMargin)
+
+  stream(filename) map fromChar collect toLine map toRow foreach render
+}
+
+
+```
 
 
 <h2>Build with sbt</h2>
 
 
-Test:
+**Test:**
 
 ``` 
 sbt test
 ```
 
 
-Run:
-
-``` 
-sbt "run [path_to_file]"
-```
-
-Demo:
+**Demo:**
 
 ``` 
 sbt "run data/time_series.txt"
