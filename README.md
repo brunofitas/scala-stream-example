@@ -31,7 +31,7 @@ window_time => 60 seconds
 
 **Output:**
 
-`[time_in_seconds] [ratio] [events_in_window] [ratio_sum] [min_ratio] [max_ratio]`
+`[time_in_seconds] [ratio] [events_in_window] [ratio_sum_in_window] [min_ratio_in_window] [max_ratio_in_window]`
 
 ```
 T          V       N RS      MinV    MaxV
