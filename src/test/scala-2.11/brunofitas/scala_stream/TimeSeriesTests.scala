@@ -1,5 +1,7 @@
 package brunofitas.scala_stream
 
+import java.util.Calendar
+
 import brunofitas.scala_stream.TimeSeries.{Line, Row, TimeSeriesException}
 import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
 
@@ -148,8 +150,13 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
   "run" should "print a table without errors" in {
 
     val filePath = getClass.getResource(validStream).getPath
+    val init = Calendar.getInstance().getTimeInMillis
 
     TimeSeries(filePath) shouldBe a [BoxedUnit]
+
+    val end = Calendar.getInstance().getTimeInMillis
+
+    println(s"Executed in ${end - init} ms")
 
   }
 }
