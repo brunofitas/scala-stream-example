@@ -84,22 +84,19 @@ class TimeSeries{
   }
 
   /** Prints out rows */
-  val render : (Row) => Unit = {
+  val renderRow : (Row) => Unit = {
     (r:Row) => {
         println(s"${r.time} ${"%.5f".format(r.ratio)} ${r.n} ${"%.5f".format(r.rs)} ${"%.5f".format(r.minV)} ${"%.5f".format(r.maxV)}")
     }
   }
 
-
-  /** Starting point
-    *
-    * @param filename path to file
-    */
+  /** Starting point */
   def run(filename: String): Unit = {
 
     renderHeader()
 
-    stream(filename) map fromChar collect toLine map toRow foreach render
+    stream(filename) map fromChar collect toLine map toRow foreach renderRow
+
   }
 
 }
