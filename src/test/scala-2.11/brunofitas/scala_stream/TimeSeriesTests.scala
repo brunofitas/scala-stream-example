@@ -1,13 +1,12 @@
 package brunofitas.scala_stream
 
 import java.util.Calendar
-
-import brunofitas.scala_stream.TimeSeries.{Line, Row, TimeSeriesException}
-import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
-
 import scala.runtime.BoxedUnit
+import org.scalatest.{FlatSpec, Matchers}
+import brunofitas.scala_stream.TimeSeries._
 
-class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
+
+class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   val validStream = "/time_series.txt"
@@ -37,7 +36,7 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
     val ts = new TimeSeries
     val filePath = getClass.getResource(validStream).getPath
 
-    ts.stream(filePath) map ts.fromChar shouldBe a [Stream[_]]
+    ts.stream(filePath) map ts.toLine shouldBe a [Stream[_]]
   }
 
   it should "return a matched line when fed with a \\n" in {
@@ -45,11 +44,12 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n')
 
-    val result = stream map ts.fromChar collect { case Some(l) => l}
+    val result = stream flatMap(c => ts.toLine(c))
 
     result.headOption shouldBe Some(Line(1234, 1.234))
 
   }
+
 
   it should "return a matched line when spaced with \\t and \\space and fed with a \\n" in {
     val ts = new TimeSeries
@@ -57,11 +57,12 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
 
     val stream = Stream[Char]('1','2','3','4','\t',' ','\t', '1','.','2','3', '4','\n')
 
-    val result = stream map ts.fromChar collect { case Some(l) => l}
+    val result = stream flatMap(c => ts.toLine(c))
 
     result.headOption shouldBe Some(Line(1234, 1.234))
 
   }
+
 
   it should "return an exception when invalid data is detected" in {
     val ts = new TimeSeries
@@ -69,7 +70,7 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
     val stream = Stream[Char]('a', 'b', 'c',' ','a','b','c','\n')
 
     val result = intercept[TimeSeriesException] {
-      stream map ts.fromChar collect { case Some(l) => l}
+      stream flatMap(c => ts.toLine(c))
     }
 
     result shouldBe a [TimeSeriesException]
@@ -78,13 +79,14 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
 
   }
 
+
   it should "return an exception when lineBuffer overflows" in {
     val ts = new TimeSeries
 
     val stream = (for ( c <- 1 to 111) yield 'c' ).toStream
 
     val result = intercept[TimeSeriesException] {
-      stream map ts.fromChar collect { case Some(l) => l}
+      stream flatMap(c => ts.toLine(c))
     }
 
     result shouldBe a [TimeSeriesException]
@@ -93,32 +95,24 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
 
   }
 
-  "toLine" should "collect a single line from a group of Option[Line]" in {
-    val ts = new TimeSeries
-
-    val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n')
-
-    val result = stream map ts.fromChar collect ts.toLine
-
-    result.toList.length shouldBe 1
-  }
 
   "toRow" should "return a Row object when fed with a Line" in {
     val ts = new TimeSeries
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n')
 
-    val result = stream map ts.fromChar collect ts.toLine map ts.toRow
+    val result = stream flatMap(c => ts.toLine(c)) map ts.toRow
 
     result.head shouldBe Row(1234, 1.234, 1, 1.234, 1.234, 1.234)
   }
+
 
   it should "return correct values from more than one event in the current window" in {
     val ts = new TimeSeries
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n', '1','2','3','5','\t','1','.','2','3', '5','\n')
 
-    val result = stream map ts.fromChar collect ts.toLine map ts.toRow
+    val result = stream flatMap(c => ts.toLine(c)) map ts.toRow
 
     val row =  result.last
 
@@ -135,7 +129,7 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n', '2','2','3','5','\t','2','.','2','3', '5','\n')
 
-    val result = stream map ts.fromChar collect ts.toLine map ts.toRow
+    val result = stream flatMap(c => ts.toLine(c)) map ts.toRow
 
     val row =  result.last
 
@@ -159,4 +153,5 @@ class TimeSeriesTests extends FlatSpec with Matchers with PrivateMethodTester{
     println(s"Executed in ${end - init} ms")
 
   }
+
 }

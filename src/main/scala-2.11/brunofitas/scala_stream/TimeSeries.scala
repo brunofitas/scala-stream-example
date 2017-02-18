@@ -39,7 +39,7 @@ class TimeSeries{
 
 
   /** Flushes the line buffer into a Option[Line] if it receives the char '\n'. */
-  val fromChar : (Char) => Option[Line] = {
+  val toLine : (Char) => Option[Line] = {
     case '\n' =>
       val parts = lineRegex.findFirstMatchIn(lineBuffer)
       lineBuffer = ""
@@ -57,16 +57,6 @@ class TimeSeries{
       lineBuffer += other
       None
   }
-
-
-  /** Collects Line objects only */
-  val toLine : PartialFunction[Option[Line], Line] = {
-    new PartialFunction[Option[Line], Line] {
-      def isDefinedAt(line: Option[Line]) = line.nonEmpty
-      def apply(line: Option[Line]) = line.get
-    }
-  }
-
 
   /** Transforms Line objects into Row objects */
   val toRow : (Line) => Row = {
@@ -95,7 +85,7 @@ class TimeSeries{
 
     renderHeader()
 
-    stream(filename) map fromChar collect toLine map toRow foreach renderRow
+    stream(filename) flatMap(c => toLine(c)) map toRow foreach renderRow
 
   }
 
