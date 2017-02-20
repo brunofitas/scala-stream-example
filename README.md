@@ -50,12 +50,11 @@ T          V       N RS      MinV    MaxV
 
 <br/>
 
-In this example I used 2 different strategies:
+This example uses 2 different strategies:
 
 TimeSeries1 - composed by objects that can be "piped" together, easy to test
 
 TimeSeries2 - compact code, stream carries a buffer, harder to test
-
 
 
 
