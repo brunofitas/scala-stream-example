@@ -50,11 +50,7 @@ T          V       N RS      MinV    MaxV
 
 <br/>
 
-This example uses 2 different strategies:
-
-TimeSeries1 - composed by objects that can be "piped" together, easy to test
-
-TimeSeries2 - compact code, stream carries a buffer, harder to test
+This example uses 2 different strategies: TimeSeries1, TimeSeries2 
 
 
 
