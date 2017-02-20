@@ -10,6 +10,10 @@ class TimeSeries{
 
   import TimeSeries._
 
+  /** ###################################################################################### **/
+  /** # Strategy 1 **/
+  /** ###################################################################################### **/
+
   /** Serves as a char buffer when parsing lines */
   private var lineBuffer: String = ""
 
@@ -26,7 +30,6 @@ class TimeSeries{
   private val windowTime = 60
 
 
-
   /** Returns a Stream[Char] from a file */
   val stream : (String) => Stream[Char] = {
     (path: String ) => {
@@ -36,7 +39,6 @@ class TimeSeries{
       }
     }
   }
-
 
   /** Flushes the line buffer into a Option[Line] if it receives the char '\n'. */
   val toLine : (Char) => Option[Line] = {
@@ -80,12 +82,65 @@ class TimeSeries{
     }
   }
 
+  def run1(filename: String): Unit = {
+
+    stream(filename) flatMap(c => toLine(c)) map toRow foreach renderRow
+
+  }
+
+  /** ###################################################################################### **/
+  /** # Strategy 2 **/
+  /** ###################################################################################### **/
+
+  def run2(filename: String):Unit = {
+    Try(Source.fromFile(filename).toStream)
+      .getOrElse(throw TimeSeriesException(1, "File not found"))
+      .scanLeft(Buffer(chars = "", lines = List.empty[Line], flush = false)) {
+        (b, c) => {
+          c match {
+
+            case '\n' =>
+              val parts = {
+                lineRegex.findFirstMatchIn(b.chars)
+                  .getOrElse(throw TimeSeriesException(2, "Error parsing line"))
+              }
+              val line = {
+                Try(Line(time = parts.group(1).trim.toInt, ratio = parts.group(2).trim.toDouble))
+                  .getOrElse(throw TimeSeriesException(3, "Line could not be parsed"))
+              }
+              Buffer(chars = "", lines = b.lines.filter(r => line.time - r.time <= 60) ++ List(line), flush = true)
+
+            case other => b.copy(chars = b.chars + other, flush = false)
+          }
+        }
+      }
+      .collect {
+        case b: Buffer if b.flush => b.lines
+      }
+      .foreach {
+        w => {
+          val ratios = w.map(_.ratio)
+          val row = (w.last.time, "%.5f".format(w.last.ratio), w.length, "%.5f".format(ratios.sum), "%.5f".format(ratios.min), "%.5f".format(ratios.max))
+          println(row.productIterator.toList.mkString(" "))
+        }
+      }
+
+  }
+  /** ###################################################################################### **/
+  /** # RUN **/
+  /** ###################################################################################### **/
+
   /** Starting point */
-  def run(filename: String): Unit = {
+  def run(filename: String, strategy: Int = 0): Unit = {
 
     renderHeader()
 
-    stream(filename) flatMap(c => toLine(c)) map toRow foreach renderRow
+    strategy match {
+      case 1 => run1(filename)
+      case 2 => run2(filename)
+      case _ => run2(filename)
+
+    }
 
   }
 
@@ -98,8 +153,10 @@ object TimeSeries {
 
   case class Row(time:Int, ratio:Double, n:Int, rs:Double, minV:Double, maxV:Double)
 
+  case class Buffer(chars:String, lines:List[Line], flush:Boolean)
+
   case class TimeSeriesException(code: Int, msg: String) extends Exception(msg)
 
-  def apply(filename:String) = new TimeSeries().run(filename)
+  def apply(filename:String, strategy:Int = 1) = new TimeSeries().run(filename, strategy)
 
 }

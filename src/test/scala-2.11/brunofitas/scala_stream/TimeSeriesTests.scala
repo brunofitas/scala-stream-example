@@ -141,12 +141,25 @@ class TimeSeriesTests extends FlatSpec with Matchers{
   }
 
 
-  "run" should "print a table without errors" in {
+  "run1" should "print a table without errors" in {
 
     val filePath = getClass.getResource(validStream).getPath
     val init = Calendar.getInstance().getTimeInMillis
 
     TimeSeries(filePath) shouldBe a [BoxedUnit]
+
+    val end = Calendar.getInstance().getTimeInMillis
+
+    println(s"Executed in ${end - init} ms")
+
+  }
+
+  "run2" should "print a table without errors" in {
+
+    val filePath = getClass.getResource(validStream).getPath
+    val init = Calendar.getInstance().getTimeInMillis
+
+    TimeSeries(filePath, 2) shouldBe a [BoxedUnit]
 
     val end = Calendar.getInstance().getTimeInMillis
 

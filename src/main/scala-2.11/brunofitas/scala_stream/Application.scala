@@ -12,7 +12,7 @@ object Application extends App{
     }
 
     /** Running TimeSeries **/
-    Try(TimeSeries(args(0))) match {
+    Try( TimeSeries( filename = args(0), strategy = Try(args(1).toInt).getOrElse(2))) match {
       case Success(s) => System.exit(0)
       case Failure(e) => e match {
         case e: TimeSeriesException => println(s"[ERROR][${e.code}][${e.msg}]"); System.exit(1)

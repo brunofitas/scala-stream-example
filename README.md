@@ -9,6 +9,12 @@ Example application that processes time series from a file using a stream from s
 
 The application takes an argument with the path to a file containing time series and prints out the analysis results taken from a rolling window of 60 seconds.
 
+The tasks are  performed using 2 different strategies. The first one, uses closures to keep previous values, and is composed by objects that can be "piped" together.
+
+The second uses a buffer that is carried on the stream and is written is a more compact way, yet harder to test.
+
+ 
+Check `run1` and `run2` methods from TimeSeries.
 
 **Input:**
 
@@ -50,21 +56,6 @@ T          V       N RS      MinV    MaxV
 
 <br/>
 
-The method `run` starts the stream:
-
-
-```
-def run(filename: String): Unit = {
-  println(
-    s"""T          V       N RS      MinV    MaxV
-        |--------------------------------------------- """.stripMargin)
-
-  stream(filename) map fromChar collect toLine map toRow foreach render
-}
-
-
-```
-
 
 <h2>Build with sbt</h2>
 
@@ -79,5 +70,8 @@ sbt test
 **Demo:**
 
 ``` 
-sbt "run data/time_series.txt"
+sbt "run data/time_series.txt"   // strategy 1
+sbt "run data/time_series.txt 1" // strategy 1
+sbt "run data/time_series.txt 2" // strategy 2
+sbt "run data/time_series.txt n" // strategy 1
 ```
