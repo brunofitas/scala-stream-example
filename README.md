@@ -11,7 +11,7 @@ The application takes an argument with the path to a file containing time series
 
 The tasks are  performed using 2 different strategies. The first one, uses closures to keep previous values, and is composed by objects that can be "piped" together.
 
-The second uses a buffer that is carried on the stream and is written is a more compact way, yet harder to test.
+The second uses a buffer that is carried on the stream and is written in a compact way, yet harder to test.
 
  
 Check `run1` and `run2` methods from TimeSeries.
