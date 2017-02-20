@@ -137,7 +137,6 @@ class TimeSeries{
 
     strategy match {
       case 1 => run1(filename)
-      case 2 => run2(filename)
       case _ => run2(filename)
     }
 

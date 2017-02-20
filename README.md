@@ -70,8 +70,7 @@ sbt test
 **Demo:**
 
 ``` 
-sbt "run data/time_series.txt"   // strategy 1
+sbt "run data/time_series.txt"   // strategy 2
 sbt "run data/time_series.txt 1" // strategy 1
-sbt "run data/time_series.txt 2" // strategy 2
-sbt "run data/time_series.txt n" // strategy 1
+sbt "run data/time_series.txt n" // strategy 2
 ```
