@@ -57,8 +57,6 @@ TimeSeries1 - composed by objects that can be "piped" together, easy to test
 TimeSeries2 - compact code, stream carries a buffer, harder to test
 
 
-I guess that TimeSeries1 performs better since it only changes the buffer when it needs, but TimeSeries2 demonstrates how one could pass an object along the stream.
-
 
 
 <h2>Build with sbt</h2>
