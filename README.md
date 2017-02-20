@@ -9,14 +9,8 @@ Example application that processes time series from a file using a stream from s
 
 The application takes an argument with the path to a file containing time series and prints out the analysis results taken from a rolling window of 60 seconds.
 
-The tasks are  performed using 2 different strategies. The first one, uses closures to keep previous values, and is composed by objects that can be "piped" together.
 
-The second uses a buffer that is carried on the stream and is written in a compact way, yet harder to test.
-
- 
-Check `run1` and `run2` methods from TimeSeries.
-
-**Input:**
+**File Input:**
 
 `[time_in_seconds] [ratio]`
 
@@ -35,7 +29,7 @@ Check `run1` and `run2` methods from TimeSeries.
 
 
 
-**Output:**
+**Console Output:**
 
 `[time_in_seconds] [ratio] [w_events] [w_ratio_sum] [w_min_ratio] [w_max_ratio]`
 
@@ -56,6 +50,16 @@ T          V       N RS      MinV    MaxV
 
 <br/>
 
+In this example I used 2 different strategies:
+
+TimeSeries1 - composed by objects that can be "piped" together, easy to test
+
+TimeSeries2 - compact code, stream carries a buffer, harder to test
+
+
+I guess that TimeSeries1 performs better since it only changes the buffer when it needs, but TimeSeries2 demonstrates how one could pass an object along the stream.
+
+
 
 <h2>Build with sbt</h2>
 
@@ -70,7 +74,7 @@ sbt test
 **Demo:**
 
 ``` 
-sbt "run data/time_series.txt"   // strategy 2
+sbt "run data/time_series.txt"   // strategy 1 - default
 sbt "run data/time_series.txt 1" // strategy 1
-sbt "run data/time_series.txt n" // strategy 2
+sbt "run data/time_series.txt 2" // strategy 2
 ```

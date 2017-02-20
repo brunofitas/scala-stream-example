@@ -3,17 +3,18 @@ package brunofitas.scala_stream
 import java.util.Calendar
 import scala.runtime.BoxedUnit
 import org.scalatest.{FlatSpec, Matchers}
-import brunofitas.scala_stream.TimeSeries._
+import brunofitas.scala_stream.timeseries.{TimeSeriesException, TimeSeries1}
+import brunofitas.scala_stream.timeseries.TimeSeries1._
 
 
-class TimeSeriesTests extends FlatSpec with Matchers{
+class TimeSeries1Tests extends FlatSpec with Matchers{
 
 
   val validStream = "/time_series.txt"
 
 
   "stream" should "return a Stream[Char] with a valid path" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
     val filePath = getClass.getResource(validStream).getPath
 
     ts.stream(filePath) shouldBe a [Stream[_]]
@@ -22,7 +23,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
   it should "return a TimeSeriesException with an invalid path" in {
 
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = intercept[TimeSeriesException] {
       ts.stream("/invalid/path/to/data")
@@ -33,14 +34,14 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   "fromChar" should "return a Stream[Option[Line]] with valid data" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
     val filePath = getClass.getResource(validStream).getPath
 
     ts.stream(filePath) map ts.toLine shouldBe a [Stream[_]]
   }
 
   it should "return a matched line when fed with a \\n" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n')
 
@@ -52,7 +53,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   it should "return a matched line when spaced with \\t and \\space and fed with a \\n" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
     val filePath = getClass.getResource(validStream).getPath
 
     val stream = Stream[Char]('1','2','3','4','\t',' ','\t', '1','.','2','3', '4','\n')
@@ -65,7 +66,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   it should "return an exception when invalid data is detected" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = Stream[Char]('a', 'b', 'c',' ','a','b','c','\n')
 
@@ -81,7 +82,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   it should "return an exception when lineBuffer overflows" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = (for ( c <- 1 to 111) yield 'c' ).toStream
 
@@ -97,7 +98,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   "toRow" should "return a Row object when fed with a Line" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n')
 
@@ -108,7 +109,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   it should "return correct values from more than one event in the current window" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n', '1','2','3','5','\t','1','.','2','3', '5','\n')
 
@@ -125,7 +126,7 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
 
   it should "return correct values from a single event in current window" in {
-    val ts = new TimeSeries
+    val ts = new TimeSeries1
 
     val stream = Stream[Char]('1','2','3','4','\t','1','.','2','3', '4','\n', '2','2','3','5','\t','2','.','2','3', '5','\n')
 
@@ -141,12 +142,12 @@ class TimeSeriesTests extends FlatSpec with Matchers{
   }
 
 
-  "run1" should "print a table without errors" in {
+  "run" should "print a table without errors" in {
 
     val filePath = getClass.getResource(validStream).getPath
     val init = Calendar.getInstance().getTimeInMillis
 
-    TimeSeries(filePath) shouldBe a [BoxedUnit]
+    TimeSeries1(filePath) shouldBe a [BoxedUnit]
 
     val end = Calendar.getInstance().getTimeInMillis
 
@@ -154,17 +155,6 @@ class TimeSeriesTests extends FlatSpec with Matchers{
 
   }
 
-  "run2" should "print a table without errors" in {
 
-    val filePath = getClass.getResource(validStream).getPath
-    val init = Calendar.getInstance().getTimeInMillis
-
-    TimeSeries(filePath, 2) shouldBe a [BoxedUnit]
-
-    val end = Calendar.getInstance().getTimeInMillis
-
-    println(s"Executed in ${end - init} ms")
-
-  }
 
 }
